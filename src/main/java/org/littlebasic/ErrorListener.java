@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.Recognizer;
 import java.io.PrintStream;
 
 /**
- * Created by matei on 2/24/17.
+ * Print parser errors to the given stderr.
  */
 public class ErrorListener extends BaseErrorListener {
 

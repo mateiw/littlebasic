@@ -3,7 +3,8 @@ package org.littlebasic;
 import java.util.function.BiFunction;
 
 /**
- * Created by matei on 2/23/17.
+ * Value class that encapsulates numeric and string values and the
+ * corresponding operations.
  */
 public class Value {
 

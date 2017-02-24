@@ -1,11 +1,8 @@
 package org.littlebasic;
 
 /**
- * Created by matei on 2/23/17.
+ * Forces a continue in a loop.
  */
 public class ContinueLoopException extends RuntimeException {
 
-//    public ContinueForException(String message) {
-//        super(message);
-//    }
 }

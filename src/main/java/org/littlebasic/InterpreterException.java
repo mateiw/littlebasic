@@ -1,9 +1,9 @@
 package org.littlebasic;
 
 /**
- * Created by matei on 2/24/17.
+ * Base exception for interpreter runtime errors.
  */
-public class InterpreterException extends RuntimeException {
+public abstract class InterpreterException extends RuntimeException {
 
     private int line;
     private int posInLine;

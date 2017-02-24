@@ -1,7 +1,7 @@
 package org.littlebasic;
 
 /**
- * Created by matei on 2/23/17.
+ * Type mismatch error.
  */
 public class TypeException extends InterpreterException {
 

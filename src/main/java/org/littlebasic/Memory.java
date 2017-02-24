@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by matei on 2/23/17.
+ * A very simple memory with only a global scope.
  */
 public class Memory {
 

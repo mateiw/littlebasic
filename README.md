@@ -3,8 +3,8 @@ LittleBasic
 
 A toy BASIC-like language implemented using [Antlr4](http://www.antlr.org/) and Java.
 
-It's just an excuse to play with Antlr and language creation. It has most structured programming constructs 
-while still being simple enough to understand for a newbie.
+It's just an excuse to play with Antlr and language creation. It's small and simple but it has 
+most structured programming constructs.
 
 ### Syntax
 
@@ -35,7 +35,7 @@ GCD=9
 
 ### Building
 
-It's built with Maven, so simply do this in the project directory:
+It's built with Maven, so simply execute this in the project directory:
 
 ```
 mvn install
@@ -50,5 +50,14 @@ In the console:
 java -jar LittleBasic.jar /path/to/MyAwesomeProgram.bas
 ```
 
+### Limitations/TODO
 
-Enjoy!
+* Limited data types - only integers and strings
+* No functions and subroutines
+* Variables have global scope only
+* No file I/O
+* Only a few built-in functions
+* No support for drawing
+* No interactive mode 
+
+**Enjoy!**

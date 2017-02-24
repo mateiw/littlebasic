@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
- * Created by matei on 2/23/17.
+ * The entry point of the interpreter.
  */
 public class Interpreter {
 

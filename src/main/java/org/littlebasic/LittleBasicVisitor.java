@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 /**
- * Created by matei on 2/21/17.
+ * The ANTLR visitor. This does the actual job of executing the program.
  */
 public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
 

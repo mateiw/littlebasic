@@ -1,7 +1,7 @@
 package org.littlebasic;
 
 /**
- * Created by matei on 2/24/17.
+ * Utility methods.
  */
 public class Utils {
 
