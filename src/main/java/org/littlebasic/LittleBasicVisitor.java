@@ -3,14 +3,13 @@ package org.littlebasic;
 import basic.LBExpressionParser;
 import basic.LittleBasicBaseVisitor;
 import basic.LittleBasicParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Reader;
 
 /**
  * Created by matei on 2/21/17.
@@ -18,14 +17,14 @@ import java.io.Reader;
 public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
 
     private InputStream stdin;
-    private OutputStream stdout;
-    private OutputStream stderr;
+    private PrintStream stdout;
+    private PrintStream stderr;
     private Memory memory;
 
     private PrintStream printStream;
     private BufferedReader inputStream;
 
-    public LittleBasicVisitor(Memory memory, InputStream stdin, OutputStream stdout, OutputStream stderr) {
+    public LittleBasicVisitor(Memory memory, InputStream stdin, PrintStream stdout, PrintStream stderr) {
         this.stdin = stdin;
         this.stdout = stdout;
         this.stderr = stderr;
@@ -82,8 +81,10 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
         Value right = visit(ctx.expression(1));
         if (ctx.op.getType() == LBExpressionParser.MUL) {
             return left.mul(right);
-        } else {
+        } else if (ctx.op.getType() == LBExpressionParser.DIV) {
             return left.div(right);
+        } else {
+            return left.mod(right);
         }
     }
 
@@ -99,15 +100,44 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
     }
 
     @Override
-    public Value visitIntfunc(LittleBasicParser.IntfuncContext ctx) {
+    public Value visitLenfunc(LittleBasicParser.LenfuncContext ctx) {
         Value arg = visit(ctx.expression());
-        return arg.toNumber();
+        if (arg.isString()) {
+            return new Value(arg.internalString().length());
+        } else {
+            throw new TypeException("Couldn't evaluate LEN(). Argument is not a string");
+        }
     }
 
     @Override
-    public Value visitLenfunc(LittleBasicParser.LenfuncContext ctx) {
+    public Value visitValfunc(LittleBasicParser.ValfuncContext ctx) {
         Value arg = visit(ctx.expression());
-        return arg.stringLength();
+        if (arg.isString()) {
+            String str = arg.internalString();
+            try {
+                return new Value(Long.parseLong(str));
+            } catch (NumberFormatException e) {
+                return Value.NaN;
+            }
+        }
+        return arg;
+    }
+
+    @Override
+    public Value visitIsnanfunc(LittleBasicParser.IsnanfuncContext ctx) {
+        Value arg = visit(ctx.expression());
+        return arg.isNaN() ? Value.TRUE : Value.FALSE;
+    }
+
+    @Override
+    public Value visitStatement(LittleBasicParser.StatementContext ctx) {
+        try {
+            return super.visitStatement(ctx);
+        } catch (TypeException e) {
+            addLocation(e, ctx);
+
+            throw e;
+        }
     }
 
     @Override
@@ -128,6 +158,10 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
             default:
                 return left.neq(right);
         }
+    }
+
+    private void addLocation(InterpreterException ex, ParserRuleContext ctx) {
+        ex.setLocation(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     }
 
     @Override
@@ -194,11 +228,12 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
         String varname = ctx.vardecl().getText();
         try {
             String line = inputStream.readLine();
-            memory.assign(varname, new Value(line));
+            Value val = new Value(line);
+            memory.assign(varname, val);
+            return val;
         } catch (IOException e) {
             throw new RuntimeException(e); // TODO
         }
-        return new Value(0);
     }
 
     @Override
@@ -211,9 +246,9 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
             memory.assign(varname, new Value(i));
             try {
                 visit(ctx.block());
-            } catch (ContinueForException e) {
+            } catch (ContinueLoopException e) {
                 continue;
-            } catch (ExitForException e) {
+            } catch (ExitLoopException e) {
                 break;
             }
         }
@@ -221,12 +256,47 @@ public class LittleBasicVisitor extends LittleBasicBaseVisitor<Value> {
     }
 
     @Override
-    public Value visitContinueForStmt(LittleBasicParser.ContinueForStmtContext ctx) {
-        throw new ContinueForException();
+    public Value visitWhilestmt(LittleBasicParser.WhilestmtContext ctx) {
+        Value cond = visit(ctx.expression());
+        while (cond.isTrue()) {
+            try {
+                visit(ctx.block());
+            } catch (ContinueLoopException e) {
+                continue;
+            } catch (ExitLoopException e) {
+                break;
+            } finally {
+                cond = visit(ctx.expression());
+            }
+        }
+        return new Value(0);
     }
 
     @Override
-    public Value visitExitForStmt(LittleBasicParser.ExitForStmtContext ctx) {
-        throw new ExitForException();
+    public Value visitRepeatstmt(LittleBasicParser.RepeatstmtContext ctx) {
+        Value cond;
+        do {
+            try {
+                visit(ctx.block());
+            } catch (ContinueLoopException e) {
+                continue;
+            } catch (ExitLoopException e) {
+                break;
+            } finally {
+                cond = visit(ctx.expression());
+            }
+        } while (cond.isFalse());
+        return new Value(0);
     }
+
+    @Override
+    public Value visitContinuestmt(LittleBasicParser.ContinuestmtContext ctx) {
+        throw new ContinueLoopException();
+    }
+
+    @Override
+    public Value visitExitstmt(LittleBasicParser.ExitstmtContext ctx) {
+        throw new ExitLoopException();
+    }
+
 }

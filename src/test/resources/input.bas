@@ -1,2 +1,2 @@
-INPUT "Name" name
-PRINT name+1
+INPUT "Name: " name
+PRINT "Hello " + name

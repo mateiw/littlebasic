@@ -9,8 +9,10 @@ public class Value {
 
     public static final Value FALSE = new Value(0);
     public static final Value TRUE = new Value(1);
+    public static final Value NaN = new Value(null, true);
 
     private Object value;
+    private boolean isNaN;
 
     public Value(String value) {
         this.value = value;
@@ -18,6 +20,11 @@ public class Value {
 
     public Value(long value) {
         this.value = value;
+    }
+
+    private Value(Object value, boolean isNaN) {
+        this.value = value;
+        this.isNaN = isNaN;
     }
 
     public long internalNumber() {
@@ -36,25 +43,23 @@ public class Value {
         return value instanceof Long;
     }
 
+    public boolean isNaN() {
+        return isNaN;
+    }
+
     public boolean isTrue() {
         assertNumber();
         return internalNumber() != 0;
     }
 
-    private boolean isFalse() {
+    public boolean isFalse() {
         assertNumber();
         return internalNumber() == 0;
     }
 
     private void assertNumber() {
         if (!isNumber()) {
-            throw new TypeException(value + " not a number");
-        }
-    }
-
-    private void assertString() {
-        if (!isString()) {
-            throw new TypeException(value + " not a string");
+            throw new TypeException("Couldn't evaluate numeric expression. Value \"" + value + "\" is not a number");
         }
     }
 
@@ -66,9 +71,20 @@ public class Value {
         return arithmeticEval(right, (l, r) -> l / r);
     }
 
+    public Value mod(Value right) {
+        return arithmeticEval(right, (l, r) -> l % r);
+    }
+
     public Value add(Value right) {
-        // TODO string + string/number concat
-        return arithmeticEval(right, (l, r) -> l + r);
+        if (isString() && right.isString()) {
+            return new Value(internalString() + right.internalString());
+        } else if (isString() && right.isNumber()) {
+            return new Value(internalString() + right.internalNumber());
+        } else if (isNumber() && right.isString()) {
+            return new Value(internalNumber() + right.internalString());
+        } else {
+            return arithmeticEval(right, (l, r) -> l + r);
+        }
     }
 
     public Value sub(Value right) {
@@ -79,15 +95,6 @@ public class Value {
         assertNumber();
         right.assertNumber();
         return new Value(oper.apply(internalNumber(), right.internalNumber()));
-    }
-
-    public Value toNumber() {
-        if (isString()) {
-            long v = Long.parseLong(internalString());
-            return new Value(v);
-        } else {
-            return this;
-        }
     }
 
     public Value gt(Value right) {
@@ -151,10 +158,6 @@ public class Value {
         return new Value(Math.round(Math.pow(internalNumber(), right.internalNumber())));
     }
 
-    public Value stringLength() {
-        assertString();
-        return new Value(internalString().length());
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -163,11 +166,16 @@ public class Value {
 
         Value value1 = (Value) o;
 
+        if (isNaN != value1.isNaN) return false;
         return value != null ? value.equals(value1.value) : value1.value == null;
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + (isNaN ? 1 : 0);
+        return result;
     }
+
+
 }

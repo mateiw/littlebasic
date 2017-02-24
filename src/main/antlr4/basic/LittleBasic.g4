@@ -9,8 +9,10 @@ statement
     | inputstmt
     | ifstmt
     | forstmt
-    | continueForStmt
-    | exitForStmt
+    | whilestmt
+    | repeatstmt
+    | continuestmt
+    | exitstmt
     | COMMENT;
 
 block
@@ -41,28 +43,35 @@ inputstmt
     ;
 
 ifstmt
-    : IF expression NEWLINE* THEN NEWLINE block elifstmt* elsestmt? END
+    : IF expression NEWLINE* THEN NEWLINE+ block elifstmt* elsestmt? END
     ;
 
 elifstmt
-    : ELSE IF expression NEWLINE* THEN NEWLINE block
+    : ELSE IF expression NEWLINE* THEN NEWLINE+ block
     ;
 
 elsestmt
-    : ELSE NEWLINE block
+    : ELSE NEWLINE+ block
     ;
 
 forstmt
     : FOR vardecl EQ expression TO expression (STEP expression)? NEWLINE+ block NEXT
     ;
 
-continueForStmt
-    : CONTINUE FOR
+whilestmt
+    : WHILE expression NEWLINE+ block END
     ;
 
-exitForStmt
-    : EXIT FOR
+repeatstmt
+    : REPEAT NEWLINE+ block NEWLINE* UNTIL expression
     ;
 
+continuestmt
+    : CONTINUE
+    ;
+
+exitstmt
+    : EXIT
+    ;
 
 

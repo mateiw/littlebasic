@@ -6,6 +6,7 @@ DIV : '/' ;
 ADD : '+' ;
 SUB : '-' ;
 EXP : '^' ;
+MOD : 'MOD' ;
 
 // logical
 NEQ : '<>' ;
@@ -26,8 +27,9 @@ LPAREN : '(' ;
 RPAREN : ')' ;
 
 // functions
-INT : 'INT' | 'int' ;
 LEN : 'LEN' | 'len' ;
+VAL : 'VAL' | 'val' ;
+ISNAN   : 'ISNAN' | 'isnan' ;
 
 // keywords
 PRINT   : 'PRINT' | 'print' ;
@@ -39,11 +41,14 @@ THEN    : 'THEN' | 'then' ;
 ELSE    : 'ELSE' | 'else' ;
 END     : 'END' | 'end';
 FOR     : 'FOR' | 'for' ;
+WHILE   : 'WHILE' | 'while' ;
+REPEAT  : 'REPEAT' | 'repeat' ;
+UNTIL   : 'UNTIL' | 'until' ;
 STEP    : 'STEP' | 'step' ;
 NEXT    : 'NEXT' | 'next' ;
 TO      : 'TO' | 'to' ;
 CONTINUE    : 'CONTINUE' | 'continue' ;
-EXIT       : 'EXIT' | 'EXIT' ;
+EXIT    : 'EXIT' | 'EXIT' ;
 
 // comments
 COMMENT : REM ~[\r\n]* ;

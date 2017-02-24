@@ -11,18 +11,19 @@ public class LittleBasicCli {
 
     public static void main(String[] args) {
         InputStream in = null;
+        Interpreter interpreter = null;
         try {
-            if (args.length == 1) {
-                in = new FileInputStream(args[0]);
-            } else {
-                in = System.in;
+            if (args.length == 0) {
+                System.out.println("Usage: littlebasic <progamfile>.bas");
+                System.exit(-1);
             }
-
-            Interpreter interpreter = new Interpreter(System.in, System.out, System.err);
+            in = new FileInputStream(args[0]);
+            interpreter = new Interpreter(System.in, System.out, System.err);
             interpreter.run(in);
+            interpreter.clear();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error running program: " + e.getMessage());
             System.exit(-1);
         } finally {
             if (in != null) {
@@ -31,9 +32,10 @@ public class LittleBasicCli {
                 } catch (IOException e) {
                 }
             }
+            if (interpreter != null) {
+                interpreter.clear();
+            }
         }
-
-
     }
 
 }

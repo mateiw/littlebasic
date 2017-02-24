@@ -14,7 +14,7 @@ expression
     | func                                      # FuncExpr
     | id                                        # IdExpr
     | (LPAREN expression RPAREN)                # ParenExpr
-    | expression op=(MUL|DIV) expression        # MulDivExpr
+    | expression op=(MUL|DIV|MOD) expression    # MulDivExpr
     | expression op=(ADD|SUB) expression        # AddSubExpr
     | expression op=(GTE|GT|LTE|LT|EQ|NEQ) expression   # RelExpr
     | NOT expression                            # NotExpr
@@ -24,8 +24,9 @@ expression
     ;
 
 func
-    : intfunc
-    | lenfunc
+    : lenfunc
+    | valfunc
+    | isnanfunc
     ;
 
 string
@@ -40,15 +41,19 @@ id
     : ID
     ;
 
-intfunc
-    : INT LPAREN expression RPAREN
-    ;
-
 lenfunc
     : LEN LPAREN expression RPAREN
     ;
 
-exprlist
-    : expression (COMMA expression)*
+valfunc
+    : VAL LPAREN expression RPAREN
     ;
+
+isnanfunc
+    : ISNAN LPAREN expression RPAREN
+    ;
+
+//exprlist
+//    : expression (COMMA expression)*
+//    ;
 
