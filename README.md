@@ -4,7 +4,7 @@ LittleBasic
 A toy BASIC-like language implemented using [Antlr4](http://www.antlr.org/) and Java.
 
 It's just an excuse to play with Antlr and language creation. It's small and simple but it has 
-most structured programming constructs.
+most constructs used in structured programming.
 
 ### Syntax
 
